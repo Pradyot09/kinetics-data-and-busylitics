@@ -2,7 +2,7 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { db } from "@/lib/firebase/firebaseInit";
 import { collection, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { DateTimeUtility } from "@/lib/utils/dateTimeUtility";
+import { DateTimeUtility } from "@/lib/utils/DateTimeUtility";
 
 const RegesterdFLHATable = ({
   currentCompanyName,
