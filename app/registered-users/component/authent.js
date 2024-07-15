@@ -9,7 +9,7 @@ const auth = getAuth( firebaseConfig);
 function firebaseapp(){
   const signUpUser = () =>{
 
-    createUserWithEmailAndPassword (auth , "baig0220@gmail.com", "lallu7869").then((Value) => console.log(Value)) 
+    createUserWithEmailAndPassword (auth , "baig0220@gmail.com", "lallu7869").then((Value) => console.log(Value))
   };
   return(
     <div className='firebaseapp'>
