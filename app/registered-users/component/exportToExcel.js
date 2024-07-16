@@ -1,4 +1,6 @@
 import * as XLSX from "xlsx";
+import { DateTimeUtility } from "@/lib/utils/DateTimeUtility";
+
 
 export const exportToExcel = (data, fileName, table) => {
   // Define the headers to match the table
@@ -73,7 +75,7 @@ export const exportToExcel = (data, fileName, table) => {
         ];
 
   // Format data to match the table structure
-  const formattedData =
+   const formattedData =
     table === "flha"
       ? data.map((flha) => {
         // console.log(flha);
@@ -111,10 +113,27 @@ export const exportToExcel = (data, fileName, table) => {
             return acc;
           },{});
 
+          const dateTimeConversion = (timestamp) => {
+            const seconds = timestamp.seconds;
+            const nanoseconds = timestamp.nanoseconds;
+            const milliseconds = (seconds * 1000) + (nanoseconds / 1000000);
+
+            const date = new Date(milliseconds);
+            const formattedDate = date.toISOString().split('T')[0];
+            const timeFormatter = new Intl.DateTimeFormat("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true,
+            });
+            const formattedTimeIn12Hour = timeFormatter.format(date);
+            return `${formattedDate} ${formattedTimeIn12Hour}`;
+          };
+
           return {
             "Name & Email": `${flha.user_name}\n${flha.user_email}`,
             "PPE Inspected": `${flha.data.ppe_inspected ? 'True':'False'}`,
-            "Date": `${new Date((flha.submitted_at.seconds * 1000) + (flha.submitted_at.nanoseconds / 1000000)).toISOString().split('T')[0]}`,
+            "Date": dateTimeConversion(flha.submitted_at),
             ...flhfData,
             ...ergonomicsData,
             ...aeHazardsData,
