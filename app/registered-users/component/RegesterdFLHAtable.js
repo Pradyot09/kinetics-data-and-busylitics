@@ -2,6 +2,7 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { db } from "@/lib/firebase/firebaseInit";
 import { collection, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import { DateTimeUtility } from "@/lib/utils/DateTimeUtility";
 
 const RegesterdFLHATable = ({
   currentCompanyName,
@@ -81,7 +82,7 @@ const RegesterdFLHATable = ({
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
               Date
-            </th> 
+            </th>
             <th
               scope="col"
               className="px-6 py-3 text-left text-xs font-medium text-white  uppercase tracking-wider bg-gray-500"
@@ -123,7 +124,7 @@ const RegesterdFLHATable = ({
               className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider bg-gray-500"
             >
              Waste Properly Managed - EH
-            </th>  
+            </th>
             <th
               scope="col"
               className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider bg-gray-500"
@@ -147,7 +148,7 @@ const RegesterdFLHATable = ({
               className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider bg-gray-500"
             >
               MSDS Reviewed - EH
-            </th> 
+            </th>
 
             <th
               scope="col"
@@ -344,6 +345,7 @@ const RegesterdFLHATable = ({
             >
              Working alone - PL
             </th>
+
             <th
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-black  uppercase tracking-wider bg-green-100"
@@ -390,13 +392,12 @@ const RegesterdFLHATable = ({
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm font-medium text-gray-900">
-                  {flha.data.ppe_inspected ? "True" : "False"} 
+                  {flha.data.ppe_inspected ? "True" : "False"}
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm font-medium text-gray-900">
-                  {new Date(flha.data.date).toLocaleDateString()} {new Date(flha.data.date).toLocaleTimeString()}
-
+                  <DateTimeUtility timestamp={flha.submitted_at}></DateTimeUtility>
                 </div>
               </td>
               {flha.data.flhf.map((item, index) => (

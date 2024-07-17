@@ -5,7 +5,7 @@ import FormControl from "./FormControl";
 import Input from "./Input";
 import Label from "./Label";
 import { Button } from "../buttons/Button";
-import { signUpAction } from "@/actions/signUpAction";
+// import { signUpAction } from "@/actions/signUpAction";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase/firebaseInit";
 import { useRouter } from "next/navigation";

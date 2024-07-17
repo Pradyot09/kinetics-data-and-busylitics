@@ -1,31 +1,65 @@
 import * as XLSX from "xlsx";
+import { DateTimeUtility } from "@/lib/utils/DateTimeUtility";
+
 
 export const exportToExcel = (data, fileName, table) => {
   // Define the headers to match the table
   const headers =
-    table === "flha"
-      ? [
-          "Name & Email",
-          "Date",
-          "Awkward body position",
-          "Over extension",
-          "Prolonged twisting",
-          "Working in tight area",
-          "Lift too heavy",
-          "Hands not in sight",
-          "Working above head",
-          "Working area clean",
-          "Material storage",
-          "Dust/Mist",
-          "Noise in areas",
-          "Extreme Temperatures",
-          "Spill Potential",
-          "Waste Property Manager",
-          "Excavation Permit Request",
-          "Other Workers In Area",
-          "Weather Conditions",
-          "MSDS Reviewed",
-        ]
+  table === "flha"
+  ? [
+      "Name & Email",
+      "PPE Inspected",
+      "Date",
+      "Work Area Clean",
+      "Material storage",
+      "Dust/MistFumes",
+      "Noise in Areas",
+      "Extreme Temperatures",
+      "Spill Potential",
+      "Waste Property Manager",
+      "Excavation Permit Request",
+      "Other Workers In Area",
+      "Weather Conditions",
+      "MSDS Reviewed",
+      "Awkward body position",
+      "Over extension",
+      "Prolonged twisting",
+      "Working in tight area",
+      "Lift too heavy",
+      "Hands not in sight",
+      "Working above head",
+      "Site Access/Road Conditions",
+      "Scafold(Inspected & Teagged)",
+      "Ladders(Tied Off)",
+      "Slips/Trips",
+      "Hoisting (Tools,Equipment",
+      "Excavation(Alarms,Routes)",
+      "Confined Space Entry Permit Required",
+      "Barricades & Signs in Place",
+      "Hole Coverings Identified",
+      "Trenching/underground Structures ",
+      "Rig Guide Lines",
+      "Power Lines",
+      "Falling Items",
+      "Hoisting or Moving Loads Overhead",
+      "Proper Tools For The Job",
+      "Equipment/Tools Inspected",
+      "Tank Plumbing",
+      "Hoses Inspected",
+      "High Pressure",
+      "High Temperature Fluids",
+      "Procedure Not Available For Task",
+      "Confusing Instructions",
+      "No Training For Task or Tools to be Used",
+      "First Time Performing The Task",
+      "Working Alone",
+      "All Hazard Remaining",
+      "All Permits Closed Out",
+      "Any Incident",
+      "Area Cleaned up at the end",
+      "Master point location"
+
+    ]
       : [
           "FullName",
           "Email",
@@ -41,26 +75,76 @@ export const exportToExcel = (data, fileName, table) => {
         ];
 
   // Format data to match the table structure
-  const formattedData =
+   const formattedData =
     table === "flha"
       ? data.map((flha) => {
+        // console.log(flha);
           const flhfData = flha.data.flhf.reduce((acc, item, index) => {
-            acc[headers[index + 2]] = item;
+            acc[headers[index + 3]] = item;
             return acc;
           }, {});
-          const aeHazardsData = flha.data.aeHazards.reduce(
-            (acc, item, index) => {
-              acc[headers[index + 2 + flha.data.flhf.length]] = item;
+
+          const ergonomicsData = flha.data.ergonomics.reduce((acc, item, index) => {
+            acc[headers[index + 3 + flha.data.flhf.length]] = item;
+            return acc;
+          },{});
+
+          const aeHazardsData = flha.data.aeHazards.reduce((acc, item, index) => {
+              acc[headers[index + 3 + flha.data.flhf.length + flha.data.ergonomics.length]] = item;
               return acc;
-            },
-            {}
-          );
+          },{});
+
+          const ouHazardsData = flha.data.ouHazards.reduce((acc, item, index) => {
+              acc[headers[index + 3 + flha.data.flhf.length + flha.data.ergonomics.length
+                 + flha.data.aeHazards.length]] = item;
+              return acc;
+          },{});
+
+          const evtHazardsData = flha.data.evtHazards.reduce((acc, item, index) => {
+              acc[headers[index + 3 + flha.data.flhf.length + flha.data.ergonomics.length
+                 + flha.data.aeHazards.length + flha.data.ouHazards.length]] = item;
+              return acc;
+          },{});
+
+          const plHazardsData = flha.data.plHazards.slice(0,-1).reduce((acc, item, index) => {
+            acc[headers[index + 3 + flha.data.flhf.length + flha.data.ergonomics.length
+               + flha.data.aeHazards.length + flha.data.ouHazards.length
+              + flha.data.evtHazards.length]] = item;
+            return acc;
+          },{});
+
+          const dateTimeConversion = (timestamp) => {
+            const seconds = timestamp.seconds;
+            const nanoseconds = timestamp.nanoseconds;
+            const milliseconds = (seconds * 1000) + (nanoseconds / 1000000);
+
+            const date = new Date(milliseconds);
+            const formattedDate = date.toISOString().split('T')[0];
+            const timeFormatter = new Intl.DateTimeFormat("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true,
+            });
+            const formattedTimeIn12Hour = timeFormatter.format(date);
+            return `${formattedDate} ${formattedTimeIn12Hour}`;
+          };
 
           return {
             "Name & Email": `${flha.user_name}\n${flha.user_email}`,
-            Date: new Date(flha.data.date).toLocaleDateString(),
+            "PPE Inspected": `${flha.data.ppe_inspected ? 'True':'False'}`,
+            "Date": dateTimeConversion(flha.submitted_at),
             ...flhfData,
+            ...ergonomicsData,
             ...aeHazardsData,
+            ...ouHazardsData,
+            ...evtHazardsData,
+            ...plHazardsData,
+            "All Hazard Remaining": `${flha.data.job_completion.all_hazard_remaining ? "True" : "False"}`,
+            "All Permits Closed Out": `${flha.data.job_completion.all_permits_closed_out ? "True" : "False"}`,
+            "Any Incident": `${flha.data.job_completion.any_incident ? "True" : "False"}`,
+            "Area Cleaned up at the end":`${flha.data.job_completion.area_cleaned_up_at_end ? "True" : "False"}`,
+            "Master point location": `${flha.data.master_point_location}`
           };
         })
       : data.map((user) => ({
