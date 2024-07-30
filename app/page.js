@@ -1,12 +1,11 @@
 import styles from "../css/globals.css";
-import Video from "next-video";
 import React from "react";
 
 export default async function Home() {
   return (
     <>
       <main>
-        <Video
+        <video
           src="video/video.mp4"
           autoPlay
           muted
